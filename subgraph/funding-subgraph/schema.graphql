@@ -1,0 +1,100 @@
+type Campaign @entity {
+  id: Bytes! # campaignAddress serves as the ID
+  fundraiser: Bytes! # address
+  name: String! # string
+  description: String! # string
+  target: BigInt! # uint256
+  deadline: BigInt! # uint256
+  createdAtBlockNumber: BigInt!
+  createdAtTimestamp: BigInt!
+  createdAtTransactionHash: Bytes!
+  ended: CampaignEnded # one-to-one relationship
+  contributions: [ContributionMade!]! @derivedFrom(field: "campaign") # one-to-many
+  refunds: [RefundIssued!]! @derivedFrom(field: "campaign") # one-to-many
+  votes: [VoteCasted!]! @derivedFrom(field: "campaign") # one-to-many
+  fundsRequested: [FundsRequested!]! @derivedFrom(field: "campaign") # one-to-many
+  fundsReleased: [FundsReleased!]! @derivedFrom(field: "campaign") # one-to-many
+  amountRaised: BigInt! # Total amount raised
+  progress: BigDecimal! # Progress percentage (amountRaised / target * 100)
+  contributors: [Bytes!]! # List of unique contributors
+  milestones: [Milestone!]! @derivedFrom(field: "campaign") # Link to milestones
+  contributorsCount: BigInt! # Number of unique contributors
+
+}
+
+type Milestone @entity {
+  id: Bytes! # Unique identifier for each milestone
+  campaign: Campaign! @relation
+  description: String! # Milestone description
+  votes: BigInt! # Number of votes for the milestone
+  completed: Boolean! # Completion status
+  withdrawalRequested: Boolean! # Indicates if withdrawal is requested
+}
+
+type CampaignEnded @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  successful: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ContributionMade @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  contributor: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FundsReleased @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  milestoneIndex: BigInt! # uint256
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type FundsRequested @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  milestoneIndex: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Initialized @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  version: BigInt! # uint64
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RefundIssued @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  contributor: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type VoteCasted @entity {
+  id: Bytes!
+  campaign: Campaign! @relation
+  voter: Bytes! # address
+  milestoneIndex: BigInt! # uint256
+  votes: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

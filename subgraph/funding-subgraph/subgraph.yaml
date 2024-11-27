@@ -1,0 +1,65 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CrowdfundingFactory
+    network: sepolia
+    source:
+      address: "0x252Fa0D2d0C389d635EE09F2C2fB46FB5A664CB9"
+      abi: CrowdfundingFactory
+      startBlock: 7158268
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CampaignCreated
+      abis:
+        - name: CrowdfundingFactory
+          file: ./abis/CrowdfundingFactory.json
+      eventHandlers:
+        - event: CampaignCreated(indexed address,indexed address,string,string,uint256,uint256,string[])
+          handler: handleCampaignCreated
+      file: ./src/crowdfunding-factory.ts
+
+templates:
+  - kind: ethereum
+    name: Crowdfunding
+    network: sepolia
+    source:
+      abi: Crowdfunding
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CampaignEnded
+        - ContributionMade
+        - FundsReleased
+        - FundsRequested
+        - Initialized
+        - RefundIssued
+        - VoteCasted
+      abis:
+        - name: Crowdfunding
+          file: ./abis/Crowdfunding.json
+      eventHandlers:
+        - event: CampaignEnded(bool)
+          handler: handleCampaignEnded
+        - event: ContributionMade(indexed address,uint256)
+          handler: handleContributionMade
+        - event: FundsReleased(uint256,uint256)
+          handler: handleFundsReleased
+        - event: FundsRequested(uint256)
+          handler: handleFundsRequested
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: RefundIssued(indexed address,uint256)
+          handler: handleRefundIssued
+        - event: VoteCasted(indexed address,uint256,uint256)
+          handler: handleVoteCasted
+      file: ./src/crowdfunding.ts
+
